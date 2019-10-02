@@ -40,9 +40,16 @@ func main() {
 
 	// Subscribe to user.create
 	nc.Subscribe("user.create", func(u *model.User) {
-		fmt.Printf("Received a user: %+v\n", u)
+		fmt.Printf("Received user.create: %+v\n", u)
 		saveUser(u)
 		nc.Publish("user.create.completed", u)
+	})
+
+	// Subscribe to user.list
+	nc.Subscribe("user.list", func(ul *[]model.User) {
+		fmt.Println("Received user.list")
+		getUsers(ul)
+		nc.Publish("user.list.completed", ul)
 	})
 
 	runtime.Goexit()
@@ -99,6 +106,39 @@ func saveUser(u *model.User) {
 	fmt.Println(res)
 	fmt.Println("User saved successfully")
 
+}
+
+func getUsers(ul *[]model.User){
+
+	fmt.Println("getUsers")
+	config := &aws.Config{
+		Region:   aws.String("us-east-1"),
+		Endpoint: aws.String("http://localhost:8000"),
+	}
+
+	sess := session.Must(session.NewSession(config))
+
+	svc := dynamodb.New(sess)
+
+	params := &dynamodb.ScanInput{
+		TableName: aws.String("Users"),
+	}
+	result, err := svc.Scan(params)
+
+	fmt.Println(result)
+	if err != nil {
+		fmt.Errorf("failed to make Query API call, %v", err)
+
+	}
+
+	
+	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &ul)
+	if err != nil {
+		fmt.Errorf("failed to unmarshal Query result items, %v", err)
+
+	}
+	fmt.Printf("Users: %+v", ul)
+	
 }
 
 func checkErr(err error) {
