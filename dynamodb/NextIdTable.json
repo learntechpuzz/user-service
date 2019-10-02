@@ -1,0 +1,13 @@
+{
+    "TableName": "NextIdTable",
+    "KeySchema": [
+      { "AttributeName": "NextKey", "KeyType": "HASH" }
+    ],
+    "AttributeDefinitions": [
+      { "AttributeName": "NextKey", "AttributeType": "S" }
+    ],
+    "ProvisionedThroughput": {
+      "ReadCapacityUnits": 5,
+      "WriteCapacityUnits": 5
+    }
+}
