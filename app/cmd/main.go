@@ -125,7 +125,7 @@ func getUsers(ul *[]model.User){
 	}
 	result, err := svc.Scan(params)
 
-	fmt.Println(result)
+	//fmt.Println(result)
 	if err != nil {
 		fmt.Errorf("failed to make Query API call, %v", err)
 
